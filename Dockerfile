@@ -1,9 +1,7 @@
 FROM rocker/shiny-verse:latest
 
 # copy the app to the image
-# COPY *.Rproj /srv/shiny-server/
 COPY *.R /srv/shiny-server/
-# COPY data /srv/shiny-server/data
 
 # select port
 EXPOSE 3838
@@ -16,7 +14,8 @@ COPY shiny-server.sh /usr/bin/shiny-server.sh
 
 RUN ["chmod", "+x", "/usr/bin/shiny-server.sh"]
 
-# install packages
+# install dependencies
+## to be migrated to separate docker image
 RUN R -e "install.packages('shinydashboard', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('DT', repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('padr', repos='http://cran.rstudio.com/')"
