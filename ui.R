@@ -10,6 +10,7 @@
 library(shiny)
 library(shinydashboard)
 library(DT)
+library(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(
@@ -20,41 +21,60 @@ shinyUI(
                       label = "Facebook token:",
                       value = ""),
             uiOutput("user"),
+            uiOutput("select_account"),
             sidebarMenu(
+                menuItem("Ad Accounts Overview",
+                         tabName = "overview",
+                         icon = icon("dashboard")),
                 menuItem("Pacing & Performance", 
                          tabName = "pacing",
-                         icon = icon("usd")),
-                menuItem("Active Campaigns", 
-                         tabName = "active",
-                         icon = icon("area-chart"))
+                         icon = icon("usd"))
+                # menuItem("Rules and Watchlist", 
+                #          tabName = "watchlist",
+                #          icon = icon("area-chart"))
             )
         ),
         dashboardBody(
             tabItems(
+                tabItem("overview",
+                        box(title = "Ad Accounts Overview", width = 12,
+                            verticalLayout(
+                                uiOutput("active-month"),
+                                dataTableOutput("account-perf")
+                                # // TO DO
+                                # uiOutput("select-metrics"),
+                                # plotlyOutput("res-spend")
+                            )
+                        )
+                ),
                 tabItem("pacing", 
-                        box(title = "Budget Pacing", width = 12,
-                            fluidRow(
-                                column(width = 12, uiOutput("active-month"))
+                        tabBox(id = "pacingtab", width = 12,
+                            tabPanel(title = "Account Pacing", width = 12,
+                                     verticalLayout(
+                                         uiOutput("budget_input"),
+                                         plotlyOutput("pacing-plot")
+                                         )
+                                     ),
+                            tabPanel(title = "Campaign Drilldown", width = 12,
+                                     verticalLayout(
+                                         uiOutput("select-account"),
+                                         actionButton("campaign-fetch", label = "Fetch"),
+                                         dataTableOutput("campaign-table")
+                                         # plotlyOutput("campaign-pacing-plot")
+                                     )
                             ),
-                            fluidRow(
-                                column(width = 12, dataTableOutput("pacing-table"))
-                            ),
-                            fluidRow(
-                                column(width = 6, 
-                                       uiOutput("select_account")),
-                                column(width = 6, numericInput("budget", 
-                                                                label = "Specify Monthly Budget",
-                                                                value = 0))
-                            ),
-                            fluidRow(
-                                column(width = 9, plotOutput("pacing-plot")),
-                                column(width = 3, uiOutput("pacing-opt"))
-                            ))),
-                tabItem("active", 
-                        fluidRow(
-                            box(title = "Active Campaigns", width = 12,
-                                dataTableOutput("active-campaigns"))
-                        ))
+                            tabPanel(title = "Campaign Pacing", width = 12,
+                                     verticalLayout(
+                                         uiOutput("campaign-budget"),
+                                         plotlyOutput("pacing-campaign")
+                                     ))
+                        )
+                )
+                # tabItem("watchlist", 
+                #         fluidRow(
+                #             box(title = "Rules and Watchlist", width = 12
+                #                 )
+                #         ))
             )
         )
     )
